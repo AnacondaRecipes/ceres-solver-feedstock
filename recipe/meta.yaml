@@ -23,6 +23,9 @@ requirements:
     - {{ compiler('cxx') }}
     - cmake
     - make  # [not win]
+    # This has a strong run_export so we don't need to put it in `host` or `run`
+    # We use llvm-openmp for openblas variants on osx.
+    - llvm-openmp                     # [osx and not (blas_impl == "mkl")]
   host:
     - glog
     - gflags
@@ -30,10 +33,19 @@ requirements:
     - mkl-devel {{ mkl }}.*           # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
+    # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
+    - intel-openmp   {{ mkl }}        # [blas_impl == "mkl"]
     - suitesparse
     - tbb
     - eigen
   run:
+    # OpenBLAS or MKL
+    - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
+    - libopenblas                     # [blas_impl == "openblas"]
+    # OpenMP
+    - {{ pin_compatible('intel-openmp') }}   # [blas_impl == "mkl"]
+    # To stop the compiler pulling in an openmp implementation itself
+    - _openmp_mutex                   # [linux]
     - glog
     - gflags
     - suitesparse
