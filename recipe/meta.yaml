@@ -11,6 +11,8 @@ source:
 
 build:
   number: 0
+  # suitesparse, gflags, glog aren't available on s390x
+  skip: true  # [s390x]
   run_exports:
     - {{ pin_subpackage('ceres-solver', max_pin='x.x') }}
     - {{ pin_compatible('eigen', max_pin='x.x.x') }}
@@ -24,7 +26,10 @@ requirements:
   host:
     - glog
     - gflags
-    - openblas
+    # OpenBLAS or MKL
+    - mkl-devel {{ mkl }}.*           # [blas_impl == "mkl"]
+    - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
+    - openblas {{ openblas }}         # [blas_impl == "openblas"]
     - suitesparse
     - tbb
     - eigen
