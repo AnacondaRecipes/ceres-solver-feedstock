@@ -1,35 +1,33 @@
+{% set name = "ceres-solver" %}
 {% set version = "2.1.0" %}
 
 package:
-  name: ceres-solver
+  name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: http://ceres-solver.org/ceres-solver-{{ version }}.tar.gz
+  url: http://ceres-solver.org/{{ name }}-{{ version }}.tar.gz
   sha256: f7d74eecde0aed75bfc51ec48c91d01fe16a6bf16bce1987a7073286701e2fc6
 
 build:
-  number: 1
+  number: 0
   run_exports:
     - {{ pin_subpackage('ceres-solver', max_pin='x.x') }}
     - {{ pin_compatible('eigen', max_pin='x.x.x') }}
 
 requirements:
   build:
-    - cmake
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - make
+    - cmake
+    - make  # [not win]
   host:
     - glog
     - gflags
-    - libblas
-    - libcblas
-    - liblapack
+    - openblas
     - suitesparse
     - tbb
     - eigen
-
   run:
     - glog
     - gflags
@@ -46,12 +44,22 @@ test:
     - if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
 
 about:
+  # HTTPS isn't supported by the ceres-solver.org website
   home: http://ceres-solver.org
+  dev_url: https://github.com/ceres-solver/ceres-solver
+  doc_url: http://ceres-solver.org/
   license: BSD-3-Clause
+  license_family: BSD
   license_file: LICENSE
   summary: A large scale non-linear optimization library
+  description: |
+    Ceres Solver 1 is an open source C++ library for modeling and solving large, complicated optimization problems. 
+    It can be used to solve Non-linear Least Squares problems with bounds constraints and general unconstrained optimization problems. 
+    It is a mature, feature rich, and performant library that has been used in production at Google since 2010. 
 
 extra:
   recipe-maintainers:
     - jschueller
     - seanyen
+  skip-lints:
+    - http_url
