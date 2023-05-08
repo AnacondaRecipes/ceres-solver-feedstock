@@ -59,9 +59,7 @@ test:
     - test -f ${PREFIX}/lib/libceres${SHLIB_EXT}  # [unix]
     - if not exist %PREFIX%\\Library\\include\\ceres\\ceres.h exit 1  # [win]
     - if not exist %PREFIX%\\Library\\lib\\ceres.lib exit 1  # [win]
-    # Disable this test for now, as it fails on windows 
-    # because we disable shared libraries by a flag `-DBUILD_SHARED_LIBS=OFF`
-    #- if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
+    - if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
 
 about:
   # HTTPS isn't supported by the ceres-solver.org website
