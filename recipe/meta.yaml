@@ -10,7 +10,7 @@ source:
   sha256: f7d74eecde0aed75bfc51ec48c91d01fe16a6bf16bce1987a7073286701e2fc6
 
 build:
-  number: 0
+  number: 1
   # suitesparse, gflags, glog aren't available on s390x
   skip: true  # [s390x]
   run_exports:
@@ -36,7 +36,7 @@ requirements:
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
     # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
     - intel-openmp   {{ mkl }}        # [blas_impl == "mkl"]
-    - suitesparse 5.10.1
+    - suitesparse 7.0.1
     - tbb 2021.*
     - eigen 3.3.7
   run:
@@ -49,7 +49,7 @@ requirements:
     - _openmp_mutex                   # [linux]
     - glog >=0.5.0,<0.6.0a0
     - gflags >=2.2.2,<2.3.0a0
-    - suitesparse >=5.10.1,<6.0a0
+    - suitesparse >=7.0.1,<8.0a0
     - tbb >=2021.3.0,<2022.0a0
     - eigen >=3.3.7,<3.4.0a0
 
@@ -59,9 +59,7 @@ test:
     - test -f ${PREFIX}/lib/libceres${SHLIB_EXT}  # [unix]
     - if not exist %PREFIX%\\Library\\include\\ceres\\ceres.h exit 1  # [win]
     - if not exist %PREFIX%\\Library\\lib\\ceres.lib exit 1  # [win]
-    # Disable this test for now, as it fails on windows 
-    # because we disable shared libraries by a flag `-DBUILD_SHARED_LIBS=OFF`
-    #- if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
+    - if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
 
 about:
   # HTTPS isn't supported by the ceres-solver.org website
