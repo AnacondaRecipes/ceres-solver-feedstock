@@ -36,7 +36,7 @@ requirements:
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
     # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
     - intel-openmp   {{ mkl }}        # [blas_impl == "mkl"]
-    - suitesparse 5.10.1
+    - suitesparse 7.0.1
     - tbb 2021.*
     - eigen 3.3.7
   run:
@@ -49,7 +49,7 @@ requirements:
     - _openmp_mutex                   # [linux]
     - glog >=0.5.0,<0.6.0a0
     - gflags >=2.2.2,<2.3.0a0
-    - suitesparse >=5.10.1,<6.0a0
+    - suitesparse >=7.0.1,<8.0a0
     - tbb >=2021.3.0,<2022.0a0
     - eigen >=3.3.7,<3.4.0a0
 
