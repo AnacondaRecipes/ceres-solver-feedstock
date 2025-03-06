@@ -1,5 +1,5 @@
 {% set name = "ceres-solver" %}
-{% set version = "2.1.0" %}
+{% set version = "2.2.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,10 +7,10 @@ package:
 
 source:
   url: http://ceres-solver.org/{{ name }}-{{ version }}.tar.gz
-  sha256: f7d74eecde0aed75bfc51ec48c91d01fe16a6bf16bce1987a7073286701e2fc6
+  sha256: 48b2302a7986ece172898477c3bcd6deb8fb5cf19b3327bc49969aad4cede82d
 
 build:
-  number: 1
+  number: 0
   # suitesparse, gflags, glog aren't available on s390x
   skip: true  # [s390x]
   run_exports:
@@ -35,9 +35,9 @@ requirements:
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
     # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
-    - intel-openmp   {{ mkl }}        # [blas_impl == "mkl"]
-    - suitesparse 7.0.1
-    - tbb 2021.*
+    - intel-openmp {{ mkl }}          # [blas_impl == "mkl"]
+    - suitesparse 7.8.3
+    - tbb 2022.*
     - eigen 3.3.7
   run:
     # OpenBLAS or MKL
@@ -49,8 +49,8 @@ requirements:
     - _openmp_mutex                   # [linux]
     - glog >=0.5.0,<0.6.0a0
     - gflags >=2.2.2,<2.3.0a0
-    - suitesparse >=7.0.1,<8.0a0
-    - tbb >=2021.3.0,<2022.0a0
+    - {{ pin_compatible('suitesparse') }}
+    - {{ pin_compatible('tbb') }}
     - eigen >=3.3.7,<3.4.0a0
 
 test:
@@ -71,9 +71,9 @@ about:
   license_file: LICENSE
   summary: A large scale non-linear optimization library
   description: |
-    Ceres Solver 1 is an open source C++ library for modeling and solving large, complicated optimization problems. 
-    It can be used to solve Non-linear Least Squares problems with bounds constraints and general unconstrained optimization problems. 
-    It is a mature, feature rich, and performant library that has been used in production at Google since 2010. 
+    Ceres Solver is an open source C++ library for modeling and solving large, complicated optimization problems. It
+    is a feature rich, mature and performant library which has been used in production at Google since 2010. Ceres
+    Solver can solve two kinds of problems.
 
 extra:
   recipe-maintainers:
