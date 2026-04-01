@@ -10,7 +10,7 @@ source:
   sha256: 48b2302a7986ece172898477c3bcd6deb8fb5cf19b3327bc49969aad4cede82d
 
 build:
-  number: 0
+  number: 1
   # suitesparse, gflags, glog aren't available on s390x
   skip: true  # [s390x]
   run_exports:
@@ -28,8 +28,8 @@ requirements:
     # We use llvm-openmp for openblas variants on osx.
     - llvm-openmp                     # [osx and not (blas_impl == "mkl")]
   host:
-    - glog 0.5.0
-    - gflags 2.2.2
+    - glog 0.7.1
+    - gflags {{ gflags }}
     # OpenBLAS or MKL
     - mkl-devel {{ mkl }}.*           # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
@@ -47,8 +47,8 @@ requirements:
     - {{ pin_compatible('intel-openmp') }}   # [blas_impl == "mkl"]
     # To stop the compiler pulling in an openmp implementation itself
     - _openmp_mutex                   # [linux]
-    - glog >=0.5.0,<0.6.0a0
-    - gflags >=2.2.2,<2.3.0a0
+    - glog 0.7.1
+    - gflags {{ gflags }}
     - {{ pin_compatible('suitesparse') }}
     - {{ pin_compatible('tbb') }}
     - eigen >=3.3.7,<3.4.0a0
