@@ -29,7 +29,7 @@ requirements:
     - llvm-openmp                     # [osx and not (blas_impl == "mkl")]
   host:
     - glog 0.7.1
-    - gflags 2.3.0
+    - gflags {{ gflags }}
     # OpenBLAS or MKL
     - mkl-devel {{ mkl }}.*           # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
@@ -48,7 +48,7 @@ requirements:
     # To stop the compiler pulling in an openmp implementation itself
     - _openmp_mutex                   # [linux]
     - glog 0.7.1
-    - gflags >=2.3.0,<2.4.0a0
+    - gflags {{ gflags }}
     - {{ pin_compatible('suitesparse') }}
     - {{ pin_compatible('tbb') }}
     - eigen >=3.3.7,<3.4.0a0
