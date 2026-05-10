@@ -1,2 +1,13 @@
 mkl:
   - 2025
+
+# Keep cuda_compiler in the local CBC even when the aggregate sets it,
+# otherwise {{ compiler('cuda') }} fails to resolve for CPU-only matrix entries.
+cuda_compiler:
+  - cuda-nvcc
+
+# Build a CPU variant on every platform, plus CUDA 12.9 / 13.0 on Linux only.
+cuda_compiler_version:
+  - None
+  - 12.9       # [linux]
+  - 13.0       # [linux]

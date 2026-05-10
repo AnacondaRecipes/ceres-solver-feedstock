@@ -1,5 +1,10 @@
 {% set name = "ceres-solver" %}
 {% set version = "2.2.0" %}
+{% set processor = "cpu" if (cuda_compiler_version or "None") == "None" else "gpu" %}
+
+# Prioritize the GPU build when __cuda is available on the host
+{% set build = 2 %}
+{% set build = build + 100 if processor == "gpu" else build %}
 
 package:
   name: {{ name|lower }}
@@ -10,7 +15,8 @@ source:
   sha256: 48b2302a7986ece172898477c3bcd6deb8fb5cf19b3327bc49969aad4cede82d
 
 build:
-  number: 1
+  number: {{ build }}
+  string: {{ processor }}_h{{ PKG_HASH }}_{{ build }}
   # suitesparse, gflags, glog aren't available on s390x
   skip: true  # [s390x]
   run_exports:
@@ -21,6 +27,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ compiler('cuda') }}          # [cuda_compiler_version != "None"]
     - cmake
     - make   # [not win]
     - ninja  # [win]
@@ -39,6 +46,12 @@ requirements:
     - suitesparse 7.8.3
     - tbb 2022.*
     - eigen 3.3.7
+    # CUDA linear-algebra libraries (sparse Schur / dense solvers on GPU)
+    - libcublas-dev                              # [cuda_compiler_version != "None"]
+    - libcusolver-dev                            # [cuda_compiler_version != "None"]
+    - libcusparse-dev                            # [cuda_compiler_version != "None"]
+    - cuda-cudart-dev                            # [cuda_compiler_version != "None"]
+    - cuda-version {{ cuda_compiler_version }}   # [cuda_compiler_version != "None"]
   run:
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
@@ -52,6 +65,9 @@ requirements:
     - {{ pin_compatible('suitesparse') }}
     - {{ pin_compatible('tbb') }}
     - eigen >=3.3.7,<3.4.0a0
+    # Require __cuda virtual package so the GPU variant only installs on hosts
+    # with a CUDA-capable driver; the CPU variant is preferred otherwise.
+    - __cuda >={{ cuda_compiler_version }}   # [cuda_compiler_version != "None"]
 
 test:
   commands:
