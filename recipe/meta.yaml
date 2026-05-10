@@ -65,9 +65,10 @@ requirements:
     - {{ pin_compatible('suitesparse') }}
     - {{ pin_compatible('tbb') }}
     - eigen >=3.3.7,<3.4.0a0
-    # Require __cuda virtual package so the GPU variant only installs on hosts
-    # with a CUDA-capable driver; the CPU variant is preferred otherwise.
-    - __cuda >={{ cuda_compiler_version }}   # [cuda_compiler_version != "None"]
+    # __cuda gates the GPU variant to CUDA-capable hosts; the CPU variant
+    # (lower build number) installs everywhere else. Version is enforced
+    # transitively via cuda-version's run_constrained.
+    - __cuda                                 # [cuda_compiler_version != "None"]
 
 test:
   commands:
@@ -76,6 +77,9 @@ test:
     - if not exist %PREFIX%\\Library\\include\\ceres\\ceres.h exit 1  # [win]
     - if not exist %PREFIX%\\Library\\lib\\ceres.lib exit 1  # [win]
     - if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
+    # GPU smoke test: libceres must be dynamically linked against the CUDA
+    # math libs when built with CUDA — proves USE_CUDA=ON actually took effect.
+    - ldd ${PREFIX}/lib/libceres${SHLIB_EXT} | grep -qE "libcublas|libcusolver|libcusparse"   # [cuda_compiler_version != "None"]
 
 about:
   # HTTPS isn't supported by the ceres-solver.org website
