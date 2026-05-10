@@ -6,8 +6,10 @@ mkl:
 cuda_compiler:
   - cuda-nvcc
 
-# Build a CPU variant on every platform, plus CUDA 12.9 / 13.0 on Linux only.
+# Build a CPU variant on every platform, plus CUDA 12.9 / 13.0 on linux and
+# win-64. (Matches the aggregate CBC's `[linux or (win and x86_64)]` selector
+# for CUDA; aggregate has no None entry so we add it for the CPU matrix slot.)
 cuda_compiler_version:
   - None
-  - 12.9       # [linux]
-  - 13.0       # [linux]
+  - 12.9       # [linux or (win and x86_64)]
+  - 13.0       # [linux or (win and x86_64)]

@@ -77,9 +77,11 @@ test:
     - if not exist %PREFIX%\\Library\\include\\ceres\\ceres.h exit 1  # [win]
     - if not exist %PREFIX%\\Library\\lib\\ceres.lib exit 1  # [win]
     - if not exist %PREFIX%\\Library\\bin\\ceres.dll exit 1  # [win]
-    # GPU smoke test: libceres must be dynamically linked against the CUDA
-    # math libs when built with CUDA — proves USE_CUDA=ON actually took effect.
-    - ldd ${PREFIX}/lib/libceres${SHLIB_EXT} | grep -qE "libcublas|libcusolver|libcusparse"   # [cuda_compiler_version != "None"]
+    # GPU smoke test: when built with CUDA, libceres must be linked against
+    # the CUDA math libs (Linux: verify via ldd) and the cuBLAS runtime must
+    # land in the install env (Windows: verify via cublas64*.dll presence).
+    - ldd ${PREFIX}/lib/libceres${SHLIB_EXT} | grep -qE "libcublas|libcusolver|libcusparse"   # [linux and cuda_compiler_version != "None"]
+    - dir /b "%PREFIX%\\Library\\bin\\cublas64*.dll" >nul   # [win and cuda_compiler_version != "None"]
 
 about:
   # HTTPS isn't supported by the ceres-solver.org website
