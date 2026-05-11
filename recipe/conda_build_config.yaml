@@ -1,5 +1,3 @@
-mkl:
-  - 2025
 
 # Keep cuda_compiler in the local CBC even when the aggregate sets it —
 # without it {{ compiler('cuda') }} fails to resolve at metadata-eval time.
