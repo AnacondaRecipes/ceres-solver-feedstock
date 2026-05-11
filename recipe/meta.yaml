@@ -34,7 +34,9 @@ requirements:
     - mkl-devel {{ mkl }}.*           # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
-    # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
+    - libgomp                         # [blas_impl == "openblas" and linux]
+    - llvm-openmp                     # [blas_impl == "openblas" and osx]
+    - vcomp14                         # [blas_impl == "openblas" and (win and x86_64)]
     - intel-openmp {{ mkl }}          # [blas_impl == "mkl"]
     - suitesparse 7.8.3
     - tbb 2022.*
@@ -45,8 +47,9 @@ requirements:
     - libopenblas                     # [blas_impl == "openblas"]
     # OpenMP
     - {{ pin_compatible('intel-openmp') }}   # [blas_impl == "mkl"]
-    # To stop the compiler pulling in an openmp implementation itself
-    - _openmp_mutex                   # [linux]
+    - libgomp                         # [blas_impl == "openblas" and linux]
+    - llvm-openmp                     # [blas_impl == "openblas" and osx]
+    - vcomp14                         # [blas_impl == "openblas" and (win and x86_64)]
     - glog 0.7.1
     - gflags {{ gflags }}
     - {{ pin_compatible('suitesparse') }}
