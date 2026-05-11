@@ -1,10 +1,11 @@
 {% set name = "ceres-solver" %}
 {% set version = "2.2.0" %}
-{% set processor = "cpu" if (cuda_compiler_version or "None") == "None" else "gpu" %}
+{% set cuda_enabled = (gpu_variant or "none") == "cuda" %}
 
-# Prioritize the GPU build when __cuda is available on the host
+# Build number: bumped from 1 to 2 on this recipe revision; +100 for the
+# GPU variant so the solver prefers it when __cuda is satisfiable.
 {% set build = 2 %}
-{% set build = build + 100 if processor == "gpu" else build %}
+{% set build = build + 100 if cuda_enabled else build %}
 
 package:
   name: {{ name|lower }}
@@ -16,7 +17,8 @@ source:
 
 build:
   number: {{ build }}
-  string: {{ processor }}_h{{ PKG_HASH }}_{{ build }}
+  string: cuda{{ cuda_compiler_version | replace('.', '') }}_h{{ PKG_HASH }}_{{ build }}  # [gpu_variant == "cuda"]
+  string: cpu_h{{ PKG_HASH }}_{{ build }}                                                  # [gpu_variant != "cuda"]
   # suitesparse, gflags, glog aren't available on s390x
   skip: true  # [s390x]
   run_exports:
@@ -27,7 +29,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('cuda') }}          # [cuda_compiler_version != "None"]
+    - {{ compiler('cuda') }}          # [gpu_variant == "cuda"]
     - cmake
     - make   # [not win]
     - ninja  # [win]
@@ -47,11 +49,11 @@ requirements:
     - tbb 2022.*
     - eigen 3.3.7
     # CUDA linear-algebra libraries (sparse Schur / dense solvers on GPU)
-    - libcublas-dev                              # [cuda_compiler_version != "None"]
-    - libcusolver-dev                            # [cuda_compiler_version != "None"]
-    - libcusparse-dev                            # [cuda_compiler_version != "None"]
-    - cuda-cudart-dev                            # [cuda_compiler_version != "None"]
-    - cuda-version {{ cuda_compiler_version }}   # [cuda_compiler_version != "None"]
+    - libcublas-dev                              # [gpu_variant == "cuda"]
+    - libcusolver-dev                            # [gpu_variant == "cuda"]
+    - libcusparse-dev                            # [gpu_variant == "cuda"]
+    - cuda-cudart-dev                            # [gpu_variant == "cuda"]
+    - cuda-version {{ cuda_compiler_version }}   # [gpu_variant == "cuda"]
   run:
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
@@ -68,7 +70,7 @@ requirements:
     # __cuda gates the GPU variant to CUDA-capable hosts; the CPU variant
     # (lower build number) installs everywhere else. Version is enforced
     # transitively via cuda-version's run_constrained.
-    - __cuda                                 # [cuda_compiler_version != "None"]
+    - __cuda                                 # [gpu_variant == "cuda"]
 
 test:
   commands:
@@ -80,8 +82,8 @@ test:
     # GPU smoke test: when built with CUDA, libceres must be linked against
     # the CUDA math libs (Linux: verify via ldd) and the cuBLAS runtime must
     # land in the install env (Windows: verify via cublas64*.dll presence).
-    - ldd ${PREFIX}/lib/libceres${SHLIB_EXT} | grep -qE "libcublas|libcusolver|libcusparse"   # [linux and cuda_compiler_version != "None"]
-    - dir /b "%PREFIX%\\Library\\bin\\cublas64*.dll" >nul   # [win and cuda_compiler_version != "None"]
+    - ldd ${PREFIX}/lib/libceres${SHLIB_EXT} | grep -qE "libcublas|libcusolver|libcusparse"   # [linux and gpu_variant == "cuda"]
+    - dir /b "%PREFIX%\\Library\\bin\\cublas64*.dll" >nul   # [win and gpu_variant == "cuda"]
 
 about:
   # HTTPS isn't supported by the ceres-solver.org website

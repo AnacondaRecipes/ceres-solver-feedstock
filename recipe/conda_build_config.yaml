@@ -1,15 +1,26 @@
 mkl:
   - 2025
 
-# Keep cuda_compiler in the local CBC even when the aggregate sets it,
-# otherwise {{ compiler('cuda') }} fails to resolve for CPU-only matrix entries.
-cuda_compiler:
-  - cuda-nvcc
+# Keep cuda_compiler in the local CBC even when the aggregate sets it —
+# without it {{ compiler('cuda') }} fails to resolve at metadata-eval time.
+cuda_compiler:                          # [linux or (win and x86_64)]
+  - cuda-nvcc                           # [linux or (win and x86_64)]
 
-# Build a CPU variant on every platform, plus CUDA 12.9 / 13.0 on linux and
-# win-64. (Matches the aggregate CBC's `[linux or (win and x86_64)]` selector
-# for CUDA; aggregate has no None entry so we add it for the CPU matrix slot.)
-cuda_compiler_version:
-  - None
-  - 12.9       # [linux or (win and x86_64)]
-  - 13.0       # [linux or (win and x86_64)]
+# gpu_variant is the structural CPU/GPU selector per AnacondaRecipes
+# convention (arrow-cpp, lightgbm, pytorch/torchvision, llama.cpp, catboost
+# all use this). zip_keys couples it with cuda_compiler_version so the
+# (variant, version) pair stays aligned across the matrix expansion.
+gpu_variant:
+  - none
+  - cuda                                # [linux or (win and x86_64)]
+  - cuda                                # [linux or (win and x86_64)]
+
+cuda_compiler_version:                  # [linux or (win and x86_64)]
+  - none                                # [linux or (win and x86_64)]
+  - 12.9                                # [linux or (win and x86_64)]
+  - 13.0                                # [linux or (win and x86_64)]
+
+zip_keys:                               # [linux or (win and x86_64)]
+  -                                     # [linux or (win and x86_64)]
+    - gpu_variant                       # [linux or (win and x86_64)]
+    - cuda_compiler_version             # [linux or (win and x86_64)]

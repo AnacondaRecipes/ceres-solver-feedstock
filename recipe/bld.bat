@@ -2,7 +2,7 @@
 echo "Building %PKG_NAME%."
 
 set "CUDA_CMAKE_ARGS=-DUSE_CUDA=OFF"
-if defined cuda_compiler_version if not "%cuda_compiler_version%"=="None" (
+if "%gpu_variant%"=="cuda" (
     rem CMAKE_CUDA_STANDARD=17 is required for CUDA 13's Thrust/CCCL on MSVC;
     rem nvcc otherwise inherits MSVC's older default and Thrust refuses to compile
     rem (fatal error C1189: "Thrust requires at least C++17").

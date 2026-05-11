@@ -1,7 +1,7 @@
 #!/bin/sh
 set -ex
 
-if [ -n "${cuda_compiler_version}" ] && [ "${cuda_compiler_version}" != "None" ]; then
+if [ "${gpu_variant}" = "cuda" ]; then
   CUDA_CMAKE_ARGS="-DUSE_CUDA=ON"
   case "${cuda_compiler_version}" in
     13.*)
